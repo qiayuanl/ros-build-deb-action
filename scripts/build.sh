@@ -9,7 +9,7 @@ cp -r ./ $ros_workspace/src/
 
 echo 'Installing dependence..'
 rosdep update > /dev/null
-rosdep install --from-paths $ros_workspace/src --ignore-packages-from-source --rosdistro $ros_distro -y > /dev/null
+rosdep install --from-paths $ros_workspace/src --ignore-packages-from-source --rosdistro $ros_distro -y -r > /dev/null
 catkin_make -C $ros_workspace
 rosdep update > /dev/null
 echo "::set-output name=catkin-ws-directory::$(echo $ros_workspace)"
