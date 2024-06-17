@@ -16,18 +16,13 @@ cp -r ./ $tmp_space
 package_list=`find $tmp_space -name package.xml | sed 's/package.xml//g'`
 package_names=$(echo "$package_list" | awk -F '/' '{print $NF}')
 
-# Add rosdep for new package
-rosdep_file="$run_directory/rosdep.yaml"
-for package in $package_names; do
-  # Convert package name to yaml key (e.g., ros-noetic-any-node to any_node)
-  yaml_key=$(echo $package | sed 's/^ros-noetic-//' | sed 's/-/_/g')
-  
-  echo "$yaml_key:" >> $rosdep_file
-  echo "  ubuntu: [$package]" >> $rosdep_file
-
-  echo $yaml_key
+echo "Add unreleased packages to rosdep"
+rosdep_file="$run_directory/local.yaml"
+echo "Add unreleased packages to rosdep"
+for PKG in $(catkin_topological_order --only-names || colcon list --topological-order --names-only); do
+  printf "%s:\n  %s:\n  - %s\n" "$PKG" "ubuntu" "ros-$ros_distro$(printf '%s' "$PKG" | tr '_' '-')" >> "$rosdep_file"
 done
-sudo bash -c 'echo "yaml file://$rosdep_file" >> /etc/ros/rosdep/sources.list.d/50-my-packages.list'
+echo "yaml file://$rosdep_file $ros_distro" >> /etc/ros/rosdep/sources.list.d/50-my-packages.list
 
 # Start packaging
 CM_PREFIX_PATH=`sed 's/:/;/g' <<< $CMAKE_PREFIX_PATH`
