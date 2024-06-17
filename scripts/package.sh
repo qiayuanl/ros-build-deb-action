@@ -22,7 +22,7 @@ echo "Add unreleased packages to rosdep"
 for PKG in $(catkin_topological_order --only-names || colcon list --topological-order --names-only); do
   printf "%s:\n  %s:\n  - %s\n" "$PKG" "ubuntu" "ros-$ros_distro$(printf '%s' "$PKG" | tr '_' '-')" >> "$rosdep_file"
 done
-echo "yaml file://$rosdep_file $ros_distro" >> /etc/ros/rosdep/sources.list.d/50-my-packages.list
+sudo bash -c 'echo "yaml file://$rosdep_file $ros_distro" >> /etc/ros/rosdep/sources.list.d/50-my-packages.list'
 
 # Start packaging
 CM_PREFIX_PATH=`sed 's/:/;/g' <<< $CMAKE_PREFIX_PATH`
