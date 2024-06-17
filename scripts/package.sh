@@ -14,8 +14,23 @@ time_stamp=`date +%Y%m%d.%H%M%S`
 mkdir $tmp_space
 cp -r ./ $tmp_space
 package_list=`find $tmp_space -name package.xml | sed 's/package.xml//g'`
-CM_PREFIX_PATH=`sed 's/:/;/g' <<< $CMAKE_PREFIX_PATH`
+package_names=$(echo "$package_list" | awk -F '/' '{print $NF}')
 
+# Add rosdep for new package
+rosdep_file="$run_directory/rosdep.yaml"
+for package in $package_names; do
+  # Convert package name to yaml key (e.g., ros-noetic-any-node to any_node)
+  yaml_key=$(echo $package | sed 's/^ros-noetic-//' | sed 's/-/_/g')
+  
+  echo "$yaml_key:" >> $rosdep_file
+  echo "  ubuntu: [$package]" >> $rosdep_file
+
+  echo $yaml_key
+done
+sudo bash -c 'echo "yaml file://$rosdep_file" >> /etc/ros/rosdep/sources.list.d/50-my-packages.list'
+
+# Start packaging
+CM_PREFIX_PATH=`sed 's/:/;/g' <<< $CMAKE_PREFIX_PATH`
 for package_source in $package_list
 do
   echo "Trying to package $package_source..."
