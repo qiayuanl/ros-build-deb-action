@@ -22,11 +22,10 @@ for PKG in $(catkin_topological_order --only-names $ros_workspace|| colcon list 
   printf "%s:\n  %s:\n  - %s\n" "$PKG" "ubuntu" "ros-$ros_distro-$(printf '%s' "$PKG" | tr '_' '-')" >> "$rosdep_file"
   echo "$PKG added" 
 done
-sudo bash -c 'echo "yaml file://$rosdep_file $ros_distro" >> /etc/ros/rosdep/sources.list.d/1-local.list'
-echo $rosdep_file
-cat $rosdep_file
+sudo bash -c 'echo "yaml file://$rosdep_file $ros_distro" >> /etc/ros/rosdep/sources.list.d/1-local.list' 
+rosdep update
 
-# Start packaging
+echo "Start packaging"
 CM_PREFIX_PATH=`sed 's/:/;/g' <<< $CMAKE_PREFIX_PATH`
 for package_source in $package_list
 do
