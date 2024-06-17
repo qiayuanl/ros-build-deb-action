@@ -8,3 +8,5 @@ sudo apt update && sudo apt-get install -y \
     dh-make \
     devscripts
 pip install shyaml
+pip3 uninstall empy
+pip3 install empy==3.3.4
