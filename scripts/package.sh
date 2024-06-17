@@ -18,8 +18,9 @@ package_names=$(echo "$package_list" | awk -F '/' '{print $NF}')
 
 echo "Add unreleased packages to rosdep"
 rosdep_file="$run_directory/local.yaml"
-for PKG in $(catkin_topological_order --only-names || colcon list --topological-order --names-only); do
-  printf "%s:\n  %s:\n  - %s\n" "$PKG" "ubuntu" "ros-$ros_distro$(printf '%s' "$PKG" | tr '_' '-')" >> "$rosdep_file"
+for PKG in $(catkin_topological_order --only-names $ros_workspace|| colcon list --topological-order --names-only $ros_workspace); do
+  printf "%s:\n  %s:\n  - %s\n" "$PKG" "ubuntu" "ros-$ros_distro-$(printf '%s' "$PKG" | tr '_' '-')" >> "$rosdep_file"
+  echo "$PKG added" 
 done
 sudo bash -c 'echo "yaml file://$rosdep_file $ros_distro" >> /etc/ros/rosdep/sources.list.d/1-local.list'
 echo $rosdep_file
